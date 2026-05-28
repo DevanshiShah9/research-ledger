@@ -5,14 +5,32 @@ from typing import Any
 
 
 @dataclass(slots=True)
+class FilingMetadata:
+    ticker: str | None
+    company_name: str | None
+    filing_type: str
+    filing_date: Any
+    fiscal_year: int | None
+    accession: str | None
+
+
+@dataclass(slots=True)
 class FilingSectionMetadata:
     ticker: str | None
     filing_type: str
     filing_date: Any
+    fiscal_year: int | None
     accession: str | None
     section_item: str | None
     section_key: str | None
     section_name: str | None
+
+
+@dataclass(slots=True)
+class Filing:
+    filing_id: str
+    metadata: FilingMetadata
+    sections: list["FilingSection"]
 
 
 @dataclass(slots=True)
