@@ -4,7 +4,7 @@ import json
 from dataclasses import asdict
 from pathlib import Path
 
-from src.ingestion.entities import Filing, FilingSectionChunk
+from src.ingestion.entities import ChunkRecord, Filing, FilingSectionChunk
 
 DEFAULT_OUTPUT_DIR = Path("data/processed")
 
@@ -23,10 +23,11 @@ def write_filing_chunks(
     output_path = _build_output_path(filing, Path(output_dir))
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
+    chunk_records = [chunk_to_record(chunk) for chunk in chunks]
     payload = {
         "filing": asdict(filing.metadata),
-        "chunk_count": len(chunks),
-        "chunks": [chunk_to_record(chunk) for chunk in chunks],
+        "chunk_count": len(chunk_records),
+        "chunks": [asdict(record) for record in chunk_records],
     }
 
     output_path.write_text(
@@ -37,21 +38,31 @@ def write_filing_chunks(
     return output_path
 
 
-def chunk_to_record(chunk: FilingSectionChunk) -> dict:
+def chunk_to_record(chunk: FilingSectionChunk) -> ChunkRecord:
     """
-    Convert a chunk dataclass into the flat record shape expected by search.
+    Convert a chunk dataclass into the flat indexing-ready object.
+
+    OpenSearch works best when frequently filtered fields are top-level fields,
+    so ticker/accession/section metadata is flattened rather than nested.
     """
-    metadata = asdict(chunk.metadata)
-    return {
-        "chunk_id": chunk.chunk_id,
-        "section_id": chunk.section_id,
-        "chunk_index": chunk.chunk_index,
-        "word_start": chunk.word_start,
-        "word_end": chunk.word_end,
-        "word_count": chunk.word_end - chunk.word_start,
-        "text": chunk.chunk,
-        "metadata": metadata,
-    }
+    metadata = chunk.metadata
+    return ChunkRecord(
+        chunk_id=chunk.chunk_id,
+        section_id=chunk.section_id,
+        chunk_index=chunk.chunk_index,
+        ticker=metadata.ticker,
+        filing_type=metadata.filing_type,
+        filing_date=metadata.filing_date,
+        fiscal_year=metadata.fiscal_year,
+        accession=metadata.accession,
+        section_item=metadata.section_item,
+        section_key=metadata.section_key,
+        section_name=metadata.section_name,
+        word_start=chunk.word_start,
+        word_end=chunk.word_end,
+        word_count=chunk.word_end - chunk.word_start,
+        text=chunk.chunk,
+    )
 
 
 def _build_output_path(filing: Filing, output_dir: Path) -> Path:
