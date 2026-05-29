@@ -72,6 +72,8 @@ class ChunkRecord:
     word_end: int
     word_count: int
     text: str
+    embedding: list[float] | None = None
+    embedding_model: str | None = None
 
     def __post_init__(self) -> None:
         if not self.chunk_id:
@@ -82,3 +84,26 @@ class ChunkRecord:
             raise ValueError(f"ChunkRecord {self.chunk_id} has invalid word offsets")
         if self.word_count != self.word_end - self.word_start:
             raise ValueError(f"ChunkRecord {self.chunk_id} has invalid word_count")
+
+
+def chunk_record_from_dict(data: dict[str, Any]) -> ChunkRecord:
+    """Build a ChunkRecord from a JSON/dict representation."""
+    return ChunkRecord(
+        chunk_id=data["chunk_id"],
+        section_id=data["section_id"],
+        chunk_index=data["chunk_index"],
+        ticker=data.get("ticker"),
+        filing_type=data["filing_type"],
+        filing_date=data["filing_date"],
+        fiscal_year=data.get("fiscal_year"),
+        accession=data.get("accession"),
+        section_item=data.get("section_item"),
+        section_key=data.get("section_key"),
+        section_name=data.get("section_name"),
+        word_start=data["word_start"],
+        word_end=data["word_end"],
+        word_count=data["word_count"],
+        text=data["text"],
+        embedding=data.get("embedding"),
+        embedding_model=data.get("embedding_model"),
+    )

@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 from src.ingestion.edgar_client import EdgarClient, get_default_edgar_client
-from src.ingestion.entities import (
+from src.schemas.entities import (
     Filing,
     FilingMetadata,
     FilingSection,

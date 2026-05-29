@@ -7,7 +7,7 @@ from src.ingestion.chunk_writer import DEFAULT_OUTPUT_DIR, write_filing_chunks
 from src.ingestion.chunker import FilingChunker
 from src.ingestion.document_parser import FilingParser
 from src.ingestion.edgar_client import EdgarClient, get_default_edgar_client
-from src.ingestion.entities import Filing, FilingSectionChunk
+from src.schemas.entities import Filing, FilingSectionChunk
 
 
 class FilingIngestionPipeline:

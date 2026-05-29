@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import re
 
-from src.ingestion.entities import FilingSection, FilingSectionChunk
+from src.schemas.entities import FilingSection, FilingSectionChunk
 
 CHUNK_SIZE_WORDS = 600
 CHUNK_OVERLAP_WORDS = 100
